@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 #
 # Copyright 2018   Suwon Shon
+#           2018   Jerry Peng
 # Usage: make_voxceleb1_sv.pl /voxceleb1/ data/.
 
 if (@ARGV != 2) {
@@ -10,19 +11,28 @@ if (@ARGV != 2) {
 }
 ($db_base, $out_base_dir) = @ARGV;
 
-$out_dir = "$out_base_dir/voxceleb1_trials";
 
-$tmp_dir = "$out_dir";
-if (system("mkdir -p $tmp_dir") != 0) {
-  die "Error making directory $tmp_dir"; 
+sub trim($)
+{
+  my $string = shift;
+  $string =~ s/^\s+//;
+  $string =~ s/\s+$//;
+  return $string;
 }
 
-open(IN_TRIALS, "<", "$db_base/voxceleb1.verification.test.csv") or die "cannot open trials list";
+
+# Format file veri_test.txt, output to voxceleb1_trials_sv
+$out_dir = "$out_base_dir";
+
+open(IN_TRIALS, "<", "$db_base/veri_test.txt") or die "Count not open the input file $db_base/veri_test.txt";
 open(OUT_TRIALS,">", "$out_dir/voxceleb1_trials_sv") or die "Could not open the output file $out_dir/voxceleb1_trials_sv";
-$dummy = <IN_TRIALS>;
+# $dummy = <IN_TRIALS>;
 while(<IN_TRIALS>) {
   chomp;
-  ($is_target,$enrollment,$test) = split(",", $_);
+  # trim($_);
+  $_ =~ s:/:-:g;
+  $_ =~ s:\.wav::g;
+  ($is_target,$enrollment,$test) = split(" ", $_);
   $target='nontarget';
   if ($is_target eq 1) {
     $target='target';
@@ -34,120 +44,38 @@ close(IN_TRIALS) || die;
 close(OUT_TRIALS) || die;
 
 
+@dirs = ("train", "test");
+for my $dir (@dirs){
+  $num_errs = 0;
+  system("mkdir -p $out_dir/$dir") and 
+    die "Could not create file $out_dir/$dir";
+  # Create wav.scp, utt2psk, spk2utt
+  system("find $db_base/$dir -type f -name '*.wav' > $out_dir/$dir/wav.list") and 
+    die "Could not create file $out_dir/$dir/wav.list";
+  open(WAV_LIST, "<", "$out_dir/$dir/wav.list") or die "Could not open input file $out_dir/$dir/wav.list";
+  open(WAV_SCP, ">", "$out_dir/$dir/wav.scp") or die "Could not open output file $out_dir/$dir/wav.scp";
+  open(UTT2SPK, ">", "$out_dir/$dir/utt2spk") or die "Could not open output file $out_dir/$dir/wav.scp";
 
-
-
-$out_dir = "$out_base_dir/voxceleb1_train";
-
-$tmp_dir = "$out_dir/tmp";
-if (system("mkdir -p $tmp_dir") != 0) {
-  die "Error making directory $tmp_dir"; 
-}
-
-open(IN_TRIALS, "<", "$db_base/voxceleb1.csv") or die "cannot open trials list";
-open(GNDR,">", "$out_dir/spk2gender") or die "Could not open the output file $out_dir/spk2gender";
-open(SPKR,">", "$out_dir/utt2spk") or die "Could not open the output file $out_dir/utt2spk";
-open(WAV,">", "$out_dir/wav.scp") or die "Could not open the output file $out_dir/wav.scp";
-
-while(<IN_TRIALS>) {
-  chomp;
-  ($filename,$utt,$start,$end,$spkr,$is_sv,$is_sid) = split(",", $_);
-  if ($is_sv eq 'dev') {
-    print WAV "$filename"," ${db_base}voxceleb1_wav/${filename}.wav\n";
-    print SPKR "$filename $spkr\n";
-    print GNDR "$spkr m\n";
+  while(my $line = <WAV_LIST>) {
+    chomp $line;
+    $line = trim($line);
+    if ($line =~ /\/(id\d{5})\/(.*)\/(\d{5})\.wav$/) {
+      print WAV_SCP "$1-$2-$3 $line\n";
+      print UTT2SPK "$1-$2-$3 $1\n";
+    } else {
+      $num_errs = $num_errs + 1;
+    }
   }
-}
+  print "$num_errs audios are abandoned from $dir/wav.list. The rest is saved into $dir/wav.scp\n";
 
-close(IN_TRIALS) || die;
-close(GNDR) || die;
-close(SPKR) || die;
-close(WAV) || die;
-
-
-if (system(
-  "utils/utt2spk_to_spk2utt.pl $out_dir/utt2spk >$out_dir/spk2utt") != 0) {
-  die "Error creating spk2utt file in directory $out_dir";
-}
-system("utils/fix_data_dir.sh $out_dir");
-if (system("utils/validate_data_dir.sh --no-text --no-feats $out_dir") != 0) {
-  die "Error validating directory $out_dir";
-}
+  close(WAV_SCP) || die;
+  close(WAV_LIST) || die;
+  close(UTT2SPK) || die;
 
 
-$out_dir = "$out_base_dir/voxceleb1_test";
-
-$tmp_dir = "$out_dir/tmp";
-if (system("mkdir -p $tmp_dir") != 0) {
-  die "Error making directory $tmp_dir"; 
-}
-
-open(IN_TRIALS, "<", "$db_base/voxceleb1.csv") or die "cannot open trials list";
-open(GNDR,">", "$out_dir/spk2gender") or die "Could not open the output file $out_dir/spk2gender";
-open(SPKR,">", "$out_dir/utt2spk") or die "Could not open the output file $out_dir/utt2spk";
-open(WAV,">", "$out_dir/wav.scp") or die "Could not open the output file $out_dir/wav.scp";
-
-while(<IN_TRIALS>) {
-  chomp;
-  ($filename,$utt,$start,$end,$spkr,$is_sv,$is_sid) = split(",", $_);
-  if ($is_sv eq 'tst') {
-    print WAV "$filename"," ${db_base}voxceleb1_wav/${filename}.wav\n";
-    print SPKR "$filename $spkr\n";
-    print GNDR "$spkr m\n";
-  }
-}
-
-close(IN_TRIALS) || die;
-close(GNDR) || die;
-close(SPKR) || die;
-close(WAV) || die;
-
-
-if (system(
-  "utils/utt2spk_to_spk2utt.pl $out_dir/utt2spk >$out_dir/spk2utt") != 0) {
-  die "Error creating spk2utt file in directory $out_dir";
-}
-system("utils/fix_data_dir.sh $out_dir");
-if (system("utils/validate_data_dir.sh --no-text --no-feats $out_dir") != 0) {
-  die "Error validating directory $out_dir";
-}
-
-
-
-
-$out_dir = "$out_base_dir/voxceleb1_test_1utt";
-
-$tmp_dir = "$out_dir/tmp";
-if (system("mkdir -p $tmp_dir") != 0) {
-  die "Error making directory $tmp_dir"; 
-}
-
-open(IN_TRIALS, "<", "$db_base/voxceleb1.csv") or die "cannot open trials list";
-open(GNDR,">", "$out_dir/spk2gender") or die "Could not open the output file $out_dir/spk2gender";
-open(SPKR,">", "$out_dir/utt2spk") or die "Could not open the output file $out_dir/utt2spk";
-open(WAV,">", "$out_dir/wav.scp") or die "Could not open the output file $out_dir/wav.scp";
-
-while(<IN_TRIALS>) {
-  chomp;
-  ($filename,$utt,$start,$end,$spkr,$is_sv,$is_sid) = split(",", $_);
-  if ($is_sv eq 'tst') {
-    print WAV "$filename"," ${db_base}voxceleb1_wav/${filename}.wav\n";
-    print SPKR "$filename $filename\n";
-    print GNDR "$filename m\n";
-  }
-}
-
-close(IN_TRIALS) || die;
-close(GNDR) || die;
-close(SPKR) || die;
-close(WAV) || die;
-
-
-if (system(
-  "utils/utt2spk_to_spk2utt.pl $out_dir/utt2spk >$out_dir/spk2utt") != 0) {
-  die "Error creating spk2utt file in directory $out_dir";
-}
-system("utils/fix_data_dir.sh $out_dir");
-if (system("utils/validate_data_dir.sh --no-text --no-feats $out_dir") != 0) {
-  die "Error validating directory $out_dir";
+  system("utils/utt2spk_to_spk2utt.pl $out_dir/$dir/utt2spk > $out_dir/$dir/spk2utt") &&
+    die "Error creating spk2utt file in directory $out_dir/$dir";
+  system("utils/fix_data_dir.sh $out_dir/$dir");
+  system("utils/validate_data_dir.sh --no-text --no-feats $out_dir/$dir") &&
+    die "Error validating directory $out_dir/$dir";
 }

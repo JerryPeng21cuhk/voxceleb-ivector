@@ -1,0 +1,14 @@
+# cat data/voxceleb1_trials_sv | awk '{print $1" "$2}' | ivector-compute-dot-products - "ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- |" "ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- |" local/scores/cosine_scores 
+# Started at Thu Dec 27 12:53:37 HKT 2018
+#
+ivector-compute-dot-products - 'ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- |' 'ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- |' local/scores/cosine_scores 
+ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- 
+ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- 
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:90) Processed 4874 iVectors.
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:94) Average ratio of iVector to expected length was 0.796283, standard deviation was 0.0853475
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:90) Processed 4874 iVectors.
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:94) Average ratio of iVector to expected length was 0.796283, standard deviation was 0.0853475
+LOG (ivector-compute-dot-products[5.5.149~2-3e50]:main():ivector-compute-dot-products.cc:108) Mean dot-product was 35.5961, standard deviation was 52.3319
+LOG (ivector-compute-dot-products[5.5.149~2-3e50]:main():ivector-compute-dot-products.cc:111) Processed 37720 trials 0 had errors.
+# Accounting: time=3 threads=1
+# Ended (code 0) at Thu Dec 27 12:53:40 HKT 2018, elapsed time 3 seconds

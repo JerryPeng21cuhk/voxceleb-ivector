@@ -1,0 +1,31 @@
+# ivector-plda-scoring --normalize-length=true --simple-length-normalization=false "ivector-copy-plda --smoothing=0.0 exp/ivectors_train/plda - |" "ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- | ivector-subtract-global-mean exp/ivectors_train/mean.vec ark:- ark:- | ivector-normalize-length ark:- ark:- |" "ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- | ivector-subtract-global-mean exp/ivectors_train/mean.vec ark:- ark:- | ivector-normalize-length ark:- ark:- |" "cat 'data/voxceleb1_trials_sv' | cut -d\  --fields=1,2 |" local/scores/plda_scores 
+# Started at Thu Dec 27 12:58:16 HKT 2018
+#
+ivector-plda-scoring --normalize-length=true --simple-length-normalization=false 'ivector-copy-plda --smoothing=0.0 exp/ivectors_train/plda - |' 'ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- | ivector-subtract-global-mean exp/ivectors_train/mean.vec ark:- ark:- | ivector-normalize-length ark:- ark:- |' 'ark:ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- | ivector-subtract-global-mean exp/ivectors_train/mean.vec ark:- ark:- | ivector-normalize-length ark:- ark:- |' 'cat '\''data/voxceleb1_trials_sv'\'' | cut -d\  --fields=1,2 |' local/scores/plda_scores 
+ivector-copy-plda --smoothing=0.0 exp/ivectors_train/plda - 
+ivector-subtract-global-mean exp/ivectors_train/mean.vec ark:- ark:- 
+ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- 
+ivector-normalize-length ark:- ark:- 
+ivector-normalize-length scp:exp/ivectors_test/ivector.scp ark:- 
+ivector-subtract-global-mean exp/ivectors_train/mean.vec ark:- ark:- 
+ivector-normalize-length ark:- ark:- 
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:96) Reading train iVectors
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:90) Processed 4874 iVectors.
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:94) Average ratio of iVector to expected length was 0.796283, standard deviation was 0.0853475
+LOG (ivector-subtract-global-mean[5.5.149~2-3e50]:main():ivector-subtract-global-mean.cc:108) Wrote 4874 mean-subtracted iVectors
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:90) Processed 4874 iVectors.
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:94) Average ratio of iVector to expected length was 1.00001, standard deviation was -nan
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:122) Read 4874 training iVectors, errors on 0
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:126) Average renormalization scale on training iVectors was 0.999577
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:129) Reading test iVectors
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:90) Processed 4874 iVectors.
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:94) Average ratio of iVector to expected length was 0.796283, standard deviation was 0.0853475
+LOG (ivector-subtract-global-mean[5.5.149~2-3e50]:main():ivector-subtract-global-mean.cc:108) Wrote 4874 mean-subtracted iVectors
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:90) Processed 4874 iVectors.
+LOG (ivector-normalize-length[5.5.149~2-3e50]:main():ivector-normalize-length.cc:94) Average ratio of iVector to expected length was 1.00001, standard deviation was -nan
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:147) Read 4874 test iVectors.
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:150) Average renormalization scale on test iVectors was 0.999577
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:214) Mean score was -8.15826, standard deviation was 21.0733
+LOG (ivector-plda-scoring[5.5.149~2-3e50]:main():ivector-plda-scoring.cc:217) Processed 37720 trials, 0 had errors.
+# Accounting: time=4 threads=1
+# Ended (code 0) at Thu Dec 27 12:58:20 HKT 2018, elapsed time 4 seconds
