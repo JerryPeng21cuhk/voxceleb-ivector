@@ -1,13 +1,13 @@
 
 # Speaker Verification task in Voxceleb1 dataset
-This repository contains simple scripts for a training i-vector speaker recognition system on Voxceleb1[1] dataset using Kaldi. It was modified based on swshon's work[2]. Note that this experiment is indeed not speaker verification. The scoring is to compute similarity between two test utterances rather than that between a enrolled speaker and a test utterance.
+This repository contains simple scripts for a training i-vector speaker recognition system on Voxceleb1[1] dataset using Kaldi. It was modified based on swshon's work[2]. Note that this experiment is  not speaker verification indeed. The scoring is to compute similarity between two test utterances rather than that between an enrolled speaker and a test utterance.
 
 # Requirement
 * Kaldi Toolkit
 
 # How to use
 1. Download and unzip audio files from http://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox1.html
-2. Create a directory named voxceleb1 with two subdirectories named train and test.  Move dev data to train directory, test data to test directory.
+2. Create a directory named *voxceleb1* with two subdirectories named *train* and *test*.  Move dev data to *train* directory, test data to *test* directory.
 3. Download List of trial pairs for Verification(http://www.robots.ox.ac.uk/~vgg/data/voxceleb/meta/veri_test.txt). Move it to voxceleb1 dir.
 4. run cmd: ln -fsr "your path to kaldi-trunk/egs/sre08/v1/sid" sid
 5. run cmd: ln -fsr "your path to kaldi-trunk/egs/sre08/v1/steps" steps
